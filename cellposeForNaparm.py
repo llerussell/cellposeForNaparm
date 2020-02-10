@@ -1,5 +1,5 @@
-# STA Movie Maker
-# Lloyd Russell 2017
+# cellpose for naparm
+# Lloyd Russell 10th January 2020
 
 import GUI
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThread, QTimer, QRectF, QUrl
@@ -7,20 +7,17 @@ from PyQt5.QtWidgets import (QComboBox, QCheckBox, QLineEdit, QSpinBox,
 							 QDoubleSpinBox, QFileDialog, QApplication,
 							 QDesktopWidget, QMainWindow, QMessageBox)
 from PyQt5.QtGui import QColor, QIcon, QPalette, QDesktopServices
-
 import sys
 import os
 import ctypes
 import json
 import numpy as np
-import difflib
 import glob
-import colorsys
-import matplotlib.pyplot as plt
 from skimage.external import tifffile
 from scipy import io as sio
 import mxnet as mx
 from cellpose import models, utils, plot
+
 
 
 class Worker(QObject):
@@ -33,33 +30,26 @@ class Worker(QObject):
 		self.p = gui_values
 		self.filepaths = filepaths
 
-	def work(self):
-		error = False
 
+	def work(self):
+		# get the parameters from gui
 		p = self.p
 
-		# check if GPU working, and if so use it
+		# check if GPU
 		if p['useGPU']:
 			device = mx.gpu()
 		else:
 			device = mx.cpu()
 
-		# model_type='cyto' or model_type='nuclei'
-		model = models.Cellpose(device, model_type=p['modelType'])
-
-		# list of files
+		# load files
+		self.status_signal.emit('Loading images...')
 		files = self.filepaths
 		nimgs = len(files)
-
-
-		
-	
-
-		self.status_signal.emit('Loading images...')
 		imgs = [tifffile.TiffFile(f, multifile=True).asarray() for f in files]
 		# imgs = [plt.imread(f) for f in files]
 
-		# if z-stack, reorder the stack to be x,y,z
+		# adjust the dimensions of the images if needed
+		# if z-stack, reorder the stack to be x,y,z:
 		if nimgs==1:
 			if len(imgs[0].shape) > 2 and imgs[0].shape[0] < imgs[0].shape[1] and imgs[0].shape[0] < imgs[0].shape[2]:
 				imgs_new = []
@@ -68,21 +58,19 @@ class Worker(QObject):
 				imgs = imgs_new
 				nimgs = len(imgs)
 
-		# assuming single channel grayscale image, reshape into 3d array
+		# assuming single channel grayscale image, reshape into 3d array:
 		for f in range(nimgs):
 			if len(imgs[f].shape) < 3:
-				imgs[f] = imgs[f].reshape(512,512,1)
+				imgs[f] = imgs[f].reshape(512,512,1)  # assuming 512x512!
 
-
-
-
+		# run cellpose
 		self.status_signal.emit('Running segmentation...')
-		# model_type='cyto' or model_type='nuclei'
 		cell_diam_px = p['cellSize']
 		rescale = 30 / cell_diam_px
 		model = models.Cellpose(device, model_type=p['modelType'])
 		masks, flows, styles, diams = model.eval(imgs, rescale=rescale, channels=[0,0], threshold=p['threshold'])
 
+		# save the results to MAT file
 		self.status_signal.emit('Saving to MAT file...')
 		base = os.path.splitext(files[0])[0]
 		sio.savemat(base + '_CELLPOSE.mat',
@@ -100,6 +88,7 @@ class Worker(QObject):
 
 		self.status_signal.emit('Done')
 		self.finished_signal.emit()
+
 
 
 class MainWindow(QMainWindow, GUI.Ui_MainWindow):
@@ -136,11 +125,13 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 		if ( urls and urls[0].scheme() == 'file' ):
 			event.acceptProposedAction()
 
+
 	def dragMoveEvent( self, event ):
 		data = event.mimeData()
 		urls = data.urls()
 		if ( urls and urls[0].scheme() == 'file' ):
 			event.acceptProposedAction()
+
 
 	def dropEvent( self, event ):
 		data = event.mimeData()
@@ -155,7 +146,6 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 			filepaths = sorted(filepaths)
 			self.ImagesLoaded_label.setText('\n'.join(filepaths))
 			self.filepaths = filepaths
-
 
 
 	def setConnects(self):
@@ -199,6 +189,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 		# save parameters
 		self.p = p
 
+
 	def setValues(self, p):
 		# populate gui with new values
 		widgets = (QComboBox, QCheckBox, QLineEdit, QSpinBox, QDoubleSpinBox)
@@ -228,11 +219,10 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 				continue
 
 
-
-
 	def setDefaults(self):
 		defaults_file = os.path.join(self.install_dir, 'GUIdefaults.cfg')
 		json.dump(self.p, open(defaults_file, 'w'), sort_keys=True, indent=4)
+
 
 	def loadDefaults(self):
 		defaults_file = os.path.join(self.install_dir, 'GUIdefaults.cfg')
@@ -240,6 +230,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 			p = json.load(open(defaults_file, 'r'))
 			self.setValues(p)
 			self.p = p
+
 
 	def clickRun(self):
 		self.getValues()
@@ -251,6 +242,7 @@ class MainWindow(QMainWindow, GUI.Ui_MainWindow):
 		self.workerThread.started.connect(self.workerObject.work)
 		self.workerObject.finished_signal.connect(self.workerThread.exit)
 		self.workerThread.start()
+
 
 	def updateStatusBar(self, msg):
 		self.statusbar.showMessage(msg)
@@ -273,7 +265,6 @@ def main(argv):
 	# show the window icon
 	if os.path.isfile('logo.png'):
 		window.setWindowIcon(QIcon('logo.png'))
-
 
 	# show it and bring to front
 	window.show()
