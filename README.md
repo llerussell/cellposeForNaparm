@@ -34,7 +34,16 @@ _CELLPOSE.m has the following fields:
 * 'threshold' - cellpose paramter - threhsold
 * 'masks' - cellpose output - array size of images with pixel coloured accoring to roi number
 
-
+## make ROIs
+Load the *_CELLPOSE.m file into makeCellposeRois.m to generate ROI and halo masks to extract time-series data from movie (with extractTraces.m)
+```
+filepath = 'C:\Users\User\Desktop\20200119_RN191_t-001_onlineREG_Plane1_CorrImg_CELLPOSE.mat';
+watershed_width = 2;
+halo_multiplier = 2;
+show_plot = 1;
+[roi, halo] = makeCellposeRois(filepath, watershed_width, halo_multiplier, show_plot);
+```
+![image](screenshots/screen5.PNG)
 
 ## Dependencies
 * cellpose
