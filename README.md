@@ -34,8 +34,8 @@ _CELLPOSE.m has the following fields:
 * 'threshold' - cellpose paramter - threhsold
 * 'masks' - cellpose output - array size of images with pixel coloured accoring to roi number
 
-## make ROIs
-Load the *_CELLPOSE.m file into makeCellposeRois.m to generate ROI and halo masks to extract time-series data from movie (with extractTraces.m)
+## Make MATLAB ROIs
+Load the *_CELLPOSE.m file into makeCellposeRois.m to generate ROI and halo masks to extract time-series data from movie (with extractTraces.m from 'simplePipeline')
 ```
 filepath = 'C:\Users\User\Desktop\20200119_RN191_t-001_onlineREG_Plane1_CorrImg_CELLPOSE.mat';
 watershed_width = 2;
@@ -51,11 +51,11 @@ show_plot = 1;
 * skimage
 
 
-## improvements
+## Improvements
 * figure out how to load cellpose.npy into matlab (readNPY.m does not work out the box)
 * modify cellpose to save MAT files, but also need to modify to allow multiple images at once
 * show output masks in this gui to allow for optimisation
-* add in image manipulation (blur, bg-removal etc) to improve results
+* add in image manipulation (blur, denoise, bg-removal etc) to improve results
 * or, run cellpose direct from matlab
   * Python Error: MXNetError: Error in operator cpnet4_downsample0_resdown0_hybridsequential5_conv0_fwd: Shape inconsistent, Provided =
 [32,2,1,1], inferred shape=(32,3,1,1)
