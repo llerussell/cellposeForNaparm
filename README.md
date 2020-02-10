@@ -46,4 +46,7 @@ _CELLPOSE.m has the following fields:
 * figure out how to load cellpose.npy into matlab (readNPY.m does not work out the box)
 * modify cellpose to save MAT files, but also need to modify to allow multiple images at once
 * show output masks in this gui to allow for optimisation
-* run cellpose direct from matlab
+* add in image manipulation (blur, bg-removal etc) to improve results
+* or, run cellpose direct from matlab
+  * Python Error: MXNetError: Error in operator cpnet4_downsample0_resdown0_hybridsequential5_conv0_fwd: Shape inconsistent, Provided =
+[32,2,1,1], inferred shape=(32,3,1,1)
