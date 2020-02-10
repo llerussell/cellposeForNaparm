@@ -20,6 +20,10 @@ nplanes = size(masks,1);
 all_rois = [];
 all_halos = [];
 
+if show_plot
+    figure
+end
+
 for p = 1:nplanes
     masks_p = double(squeeze(masks(p,:,:)));
     
@@ -71,12 +75,18 @@ for p = 1:nplanes
     end
     
     
-    
+
     % plot the results
     if show_plot
         max_roi = max(all_rois{p},[],3);
         max_halo = max(all_halos{p},[],3);
-        figure; imagesc(max_roi + (max_halo/2)); axis square; axis off; drawnow
+        subplot(2,2,p)
+        fov_im = double(squeeze(img(p,:,:)));
+        fov_im = fov_im ./ max(fov_im(:));
+        roi_im = max_roi + (max_halo/2);
+        imagesc([fov_im roi_im]);
+        axis equal; axis off; drawnow
+        title(['Plane ' num2str(p)])
     end
     
     

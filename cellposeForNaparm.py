@@ -1,7 +1,7 @@
 # cellpose for naparm
 # Lloyd Russell 10th January 2020
 
-import GUI
+from GUI import GUI
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThread, QTimer, QRectF, QUrl
 from PyQt5.QtWidgets import (QComboBox, QCheckBox, QLineEdit, QSpinBox,
 							 QDoubleSpinBox, QFileDialog, QApplication,
@@ -16,7 +16,7 @@ import glob
 from skimage.external import tifffile
 from scipy import io as sio
 import mxnet as mx
-from cellpose import models, utils, plot
+from cellpose import models
 
 
 
@@ -263,8 +263,8 @@ def main(argv):
 		ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 	# show the window icon
-	if os.path.isfile('logo.png'):
-		window.setWindowIcon(QIcon('logo.png'))
+	if os.path.isfile('GUI/cellpose.png'):
+		window.setWindowIcon(QIcon('GUI/cellpose.png'))
 
 	# show it and bring to front
 	window.show()
