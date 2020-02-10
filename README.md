@@ -40,3 +40,10 @@ _CELLPOSE.m has the following fields:
 * cellpose
 * pyqt5
 * skimage
+
+
+## improvements
+* figure out how to load cellpose.npy into matlab (readNPY.m does not work out the box)
+* modify cellpose to save MAT files, but also need to modify to allow multiple images at once
+* show output masks in this gui to allow for optimisation
+* run cellpose direct from matlab
