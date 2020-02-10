@@ -5,9 +5,9 @@ a little utility to generate [cellpose](https://github.com/MouseLand/cellpose) r
 * drag and drop images into the window
 * adjust settings (optimise using the cellpose gui)
 * click run
-* load the output MAT file into naparm
+* load the generated '*_CELLPOSE.mat' file into naparm
 
-## screens
+## Screens
 The GUI:
 
 ![image](screenshots/screen1.PNG)
@@ -23,7 +23,19 @@ Loaded into Naparm:
 ![image](screenshots/screen4.PNG)
 
 
-## dependencies
+## Output format
+_CELLPOSE.m has the following fields:
+* 'software' - flag to know genreated by cellpose
+* 'img' - the images loaded into cellpose
+* 'files' - the filepaths of the images
+* 'model' cellpose parameter - the type of model
+* 'cellsize' - cellpose paramter - roi size in pixels
+* 'threshold' - cellpose paramter - threhsold
+* 'masks' - cellpose output - array size of images with pixel coloured accoring to roi number
+
+
+
+## Dependencies
 * cellpose
 * pyqt5
 * skimage
